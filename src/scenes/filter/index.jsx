@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 const Team = () => {
   const [customerId, setCustomerId] = useState("");
   const [city, setCity] = useState("");
+  const [cities, setCities] = useState([]);
   const [state, setState] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -13,40 +14,47 @@ const Team = () => {
   const [loyaltyStatus, setLoyaltyStatus] = useState("");
   const [minAnnualIncome, setMinAnnualIncome] = useState("");
   const [maxAnnualIncome, setMaxAnnualIncome] = useState("");
-  const [transactionType, setTransactionType] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [visibleRows, setVisibleRows] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(true);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "ascending" });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [perPage] = useState(10);
 
-  const fetchFilteredData = async () => {
+  useEffect(() => {
+    const fetchCities = async () => {
+      const response = await fetch("http://127.0.0.1:5002/api/get_cities");
+      const data = await response.json();
+      setCities(data);
+    };
+    fetchCities();
+  }, []);
+
+  const fetchFilteredData = async (page = 1) => {
     setIsLoading(true);
-    let url = "http://127.0.0.1:5002/api/get_filtered_data?";
-    if (customerId) url += `customer_id=${customerId}&`;
-    if (city) url += `city=${city}&`;
-    if (state) url += `state=${state}&`;
-    if (startDate && endDate) url += `start_date=${startDate}&end_date=${endDate}&`;
-    if (category) url += `category=${category}&`;
-    if (productName) url += `product_name=${productName}&`;
-    if (storeType) url += `store_type=${storeType}&`;
-    if (paymentMethod) url += `payment_method=${paymentMethod}&`;
-    if (loyaltyStatus) url += `loyalty_status=${loyaltyStatus}&`;
-    if (minAnnualIncome) url += `min_annual_income=${minAnnualIncome}&`;
-    if (maxAnnualIncome) url += `max_annual_income=${maxAnnualIncome}&`;
-    if (transactionType) url += `transaction_type=${transactionType}&`;
-
-    console.log("🔍 Fetching data from:", url);
+    let url = `http://127.0.0.1:5002/api/get_filtered_data?page=${page}&per_page=${perPage}`;
+    if (customerId) url += `&customer_id=${customerId}`;
+    if (city) url += `&city=${city}`;
+    if (state) url += `&state=${state}`;
+    if (startDate && endDate) url += `&start_date=${startDate}&end_date=${endDate}`;
+    if (category) url += `&category=${category}`;
+    if (productName) url += `&product_name=${productName}`;
+    if (storeType) url += `&store_type=${storeType}`;
+    if (paymentMethod) url += `&payment_method=${paymentMethod}`;
+    if (loyaltyStatus) url += `&loyalty_status=${loyaltyStatus}`;
+    if (minAnnualIncome) url += `&min_annual_income=${minAnnualIncome}`;
+    if (maxAnnualIncome) url += `&max_annual_income=${maxAnnualIncome}`;
 
     try {
       const response = await fetch(url);
-      if (!response.ok) throw new Error(`❌ Server Error: ${response.status}`);
       const data = await response.json();
-      console.log("✅ Fetched Data:", data);
-      setFilteredData(data);
-      setVisibleRows(10);
+      setFilteredData(data.data);
+      setTotalRecords(data.total_records);
+      setCurrentPage(data.page);
+      setVisibleRows(perPage);
     } catch (error) {
-      console.error("❌ Fetch Error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -88,13 +96,13 @@ const Team = () => {
     }
   }, [minAnnualIncome, maxAnnualIncome]);
 
-  // Updated Styles
   const containerStyle = {
     minHeight: "100vh",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     margin: "1rem",
+    backgroundColor: "#1a1a1a",
   };
 
   const cardStyle = {
@@ -110,12 +118,17 @@ const Team = () => {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+    color: "#fff",
   };
 
   const buttonToggleStyle = {
     fontWeight: "600",
     borderRadius: "0.75rem",
     border: "none",
+    backgroundColor: "#444",
+    color: "#fff",
+    padding: "0.5rem 1rem",
+    cursor: "pointer",
   };
 
   const inputStyle = {
@@ -123,13 +136,23 @@ const Team = () => {
     border: "none",
     outline: "none",
     fontSize: "1rem",
-    backgroundColor: "#333",
+    backgroundColor: "#444",
     color: "#fff",
+    padding: "0.5rem 0.75rem",
+    width: "200px",
+    height: "48px",
+    boxSizing: "border-box",
+    textAlign: "left",
+    lineHeight: "1.5",
   };
 
   const selectStyle = {
     ...inputStyle,
     appearance: "none",
+    padding: "0.5rem 0.75rem",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
   };
 
   const buttonStyle = {
@@ -139,19 +162,21 @@ const Team = () => {
     border: "none",
     cursor: "pointer",
     fontSize: "1.2rem",
-    backgroundColor: "#333",
+    backgroundColor: "#444",
     color: "#fff",
+    padding: "0.75rem",
+    marginTop: "1rem",
   };
 
   const disabledButtonStyle = {
-    opacity: 0.5,
+    opacity: "0.5",
     cursor: "not-allowed",
   };
 
   const tableContainerStyle = {
     marginTop: "3.5rem",
     borderRadius: "1.25rem",
-    border: "2px solid #222", // Dark border for visibility
+    border: "2px solid #222",
   };
 
   const filteredDataHeaderStyle = {
@@ -159,17 +184,17 @@ const Team = () => {
     fontWeight: "700",
     marginBottom: "1.5rem",
     paddingBottom: "0.75rem",
-    borderBottom: "2px solid #222", // Dark border under "Filtered Data"
-    color: "#fff", // Ensure text is visible against dark background
+    borderBottom: "2px solid #222",
+    color: "#fff",
   };
 
   const tableHeaderStyle = {
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: "0.1em",
-    color: "#000", // Set column headings to black
-    backgroundColor: "#f0f0f0", // Light background for contrast
-    padding: "1rem", // Add padding for better spacing
+    color: "#000",
+    backgroundColor: "#f0f0f0",
+    padding: "1rem",
   };
 
   const tableCellStyle = {
@@ -186,24 +211,21 @@ const Team = () => {
     marginTop: "3.5rem",
     textAlign: "center",
     fontSize: "1.5rem",
+    color: "#fff",
   };
 
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
-        {/* Filter Section */}
         <div style={headerStyle}>
-          <span>Filter Data</span>
-          <button
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            style={buttonToggleStyle}
-          >
+          <span>Self Service Reports</span>
+          <button onClick={() => setIsFilterOpen(!isFilterOpen)} style={buttonToggleStyle}>
             {isFilterOpen ? "Hide Filters" : "Show Filters"}
           </button>
         </div>
 
         {isFilterOpen && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "2rem", marginBottom: "3rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "1rem", marginBottom: "3rem" }}>
             <input
               type="text"
               placeholder="Customer ID"
@@ -211,13 +233,14 @@ const Team = () => {
               value={customerId}
               onChange={(e) => setCustomerId(e.target.value)}
             />
-            <input
-              type="text"
-              placeholder="City"
-              style={inputStyle}
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            />
+            <select style={selectStyle} value={city} onChange={(e) => setCity(e.target.value)}>
+              <option value="" style={{ color: "#fff" }}>All Cities</option>
+              {cities.map((cityOption, index) => (
+                <option key={index} value={cityOption} style={{ color: "#fff" }}>
+                  {cityOption}
+                </option>
+              ))}
+            </select>
             <input
               type="text"
               placeholder="State"
@@ -286,26 +309,19 @@ const Team = () => {
               value={maxAnnualIncome}
               onChange={(e) => setMaxAnnualIncome(e.target.value)}
             />
-            <select
-              style={selectStyle}
-              value={transactionType}
-              onChange={(e) => setTransactionType(e.target.value)}
-            >
-              <option value="">All Transactions</option>
-              <option value="UPI">UPI</option>
-              <option value="Debit Card">Debit Card</option>
-              <option value="Credit Card">Credit Card</option>
-              <option value="Wallet">Wallet</option>
+            <select style={selectStyle} value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
+              <option value="" style={{ color: "#fff" }}>All Payments</option>
+              <option value="UPI" style={{ color: "#fff" }}>UPI</option>
+              <option value="Debit Card" style={{ color: "#fff" }}>Debit Card</option>
+              <option value="Credit Card" style={{ color: "#fff" }}>Credit Card</option>
+              <option value="Wallet" style={{ color: "#fff" }}>Wallet</option>
             </select>
           </div>
         )}
 
         <button
-          style={{
-            ...buttonStyle,
-            ...(isLoading ? disabledButtonStyle : {}),
-          }}
-          onClick={fetchFilteredData}
+          style={{ ...buttonStyle, ...(isLoading ? disabledButtonStyle : {}) }}
+          onClick={() => fetchFilteredData(currentPage)}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -321,73 +337,45 @@ const Team = () => {
           )}
         </button>
 
-        {/* Table Section */}
         {filteredData.length > 0 ? (
           <div style={tableContainerStyle}>
             <h3 style={filteredDataHeaderStyle}>
-              Filtered Data ({filteredData.length} results)
+              Filtered Data ({totalRecords} results)
             </h3>
 
             <div style={{ overflowX: "auto", borderRadius: "1.25rem" }}>
               <table style={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={tableHeaderStyle}>
-                    <th
-                      style={tableCellStyle}
-                      onClick={() => requestSort("transaction_date")}
-                    >
+                    <th style={tableCellStyle} onClick={() => requestSort("transaction_date")}>
                       Transaction Date {sortConfig.key === "transaction_date" && (sortConfig.direction === "ascending" ? "↑" : "↓")}
                     </th>
-                    <th
-                      style={tableCellStyle}
-                      onClick={() => requestSort("customer_id")}
-                    >
+                    <th style={tableCellStyle} onClick={() => requestSort("customer_id")}>
                       Customer ID {sortConfig.key === "customer_id" && (sortConfig.direction === "ascending" ? "↑" : "↓")}
                     </th>
-                    <th
-                      style={tableCellStyle}
-                      onClick={() => requestSort("city")}
-                    >
+                    <th style={tableCellStyle} onClick={() => requestSort("city")}>
                       City {sortConfig.key === "city" && (sortConfig.direction === "ascending" ? "↑" : "↓")}
                     </th>
-                    <th
-                      style={tableCellStyle}
-                      onClick={() => requestSort("state")}
-                    >
+                    <th style={tableCellStyle} onClick={() => requestSort("state")}>
                       State {sortConfig.key === "state" && (sortConfig.direction === "ascending" ? "↑" : "↓")}
                     </th>
-                    <th
-                      style={tableCellStyle}
-                      onClick={() => requestSort("category")}
-                    >
+                    <th style={tableCellStyle} onClick={() => requestSort("category")}>
                       Category {sortConfig.key === "category" && (sortConfig.direction === "ascending" ? "↑" : "↓")}
                     </th>
-                    <th
-                      style={tableCellStyle}
-                      onClick={() => requestSort("product_name")}
-                    >
+                    <th style={tableCellStyle} onClick={() => requestSort("product_name")}>
                       Product Name {sortConfig.key === "product_name" && (sortConfig.direction === "ascending" ? "↑" : "↓")}
                     </th>
-                    <th
-                      style={tableCellStyle}
-                      onClick={() => requestSort("store_type")}
-                    >
+                    <th style={tableCellStyle} onClick={() => requestSort("store_type")}>
                       Store Type {sortConfig.key === "store_type" && (sortConfig.direction === "ascending" ? "↑" : "↓")}
                     </th>
-                    <th
-                      style={tableCellStyle}
-                      onClick={() => requestSort("payment_method")}
-                    >
+                    <th style={tableCellStyle} onClick={() => requestSort("payment_method")}>
                       Payment Method {sortConfig.key === "payment_method" && (sortConfig.direction === "ascending" ? "↑" : "↓")}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {getSortedData().slice(0, visibleRows).map((item, index) => (
-                    <tr
-                      key={index}
-                      style={tableRowStyle}
-                    >
+                    <tr key={index} style={tableRowStyle}>
                       <td style={{ padding: "1rem", color: "#fff" }}>{item.transaction_date}</td>
                       <td style={{ padding: "1rem", color: "#fff" }}>{item.customer_id}</td>
                       <td style={{ padding: "1rem", color: "#fff" }}>{item.city}</td>
@@ -402,11 +390,14 @@ const Team = () => {
               </table>
             </div>
 
-            {visibleRows < filteredData.length && (
+            {visibleRows < totalRecords && (
               <div style={{ display: "flex", justifyContent: "center", marginTop: "3rem" }}>
                 <button
                   style={buttonStyle}
-                  onClick={() => setVisibleRows(visibleRows + 10)}
+                  onClick={() => {
+                    setCurrentPage(currentPage + 1);
+                    fetchFilteredData(currentPage + 1);
+                  }}
                 >
                   See More
                 </button>
@@ -421,7 +412,6 @@ const Team = () => {
   );
 };
 
-// Add this to your CSS file or <style> tag in your HTML to support animations
 const styleSheet = document.createElement("style");
 styleSheet.textContent = `
   @keyframes fadeIn {
@@ -435,6 +425,19 @@ styleSheet.textContent = `
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
+  }
+  /* Ensure placeholder text is white for inputs */
+  input::placeholder {
+    color: #fff;
+    opacity: 1; /* Override default opacity */
+  }
+  /* Ensure select options are white (though this is limited by browser support) */
+  select option {
+    color: #fff;
+    background-color: #444;
+  }
+  select:invalid {
+    color: #fff;
   }
 `;
 document.head.appendChild(styleSheet);

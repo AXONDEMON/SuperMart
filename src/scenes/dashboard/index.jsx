@@ -7,16 +7,18 @@ import {
 } from "@mui/material";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
-import LineChart from "../../components/LineChart";
-import GeographyChart from "../../components/GeographyChart";
+import LineChart from "../../components/PCAChart";
 import StatBox from "../../components/StatBox";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import React, { useState, useEffect, useRef } from "react";
 
+
 const Dashboard = () => {
+  const handleRedirect = () => {
+    window.location.href = "http://127.0.0.1:8000/docs";
+};
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isSmallScreen = useMediaQuery("(max-width: 1200px)");
@@ -25,11 +27,11 @@ const Dashboard = () => {
   const [totalProfit, setTotalProfit] = useState(null);
   const [averageBasketSize, setAverageBasketSize] = useState(null);
   const [lowConversionProducts, setLowConversionProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Unified loading state
+  const [isLoading, setIsLoading] = useState(true); 
 
-  const scrollRef = useRef(null); // Reference for the scrollable container
+  const scrollRef = useRef(null); 
 
-  // Fetch all data together for even loading
+  // Fetch all data together for render loading
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -47,7 +49,7 @@ const Dashboard = () => {
           conversionRes.filter((item) => item.conversion_rate <= 8) || []
         );
       } catch (error) {
-        console.error("❌ Error fetching dashboard data:", error);
+        console.error("Error fetching dashboard data:", error);
         setTotalSales("Error");
         setTotalProfit("Error");
         setAverageBasketSize("Error");
@@ -60,13 +62,13 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  // Automatic scrolling effect
+  // Automatic Scrolling Automation for Low Insights Products
   useEffect(() => {
     const container = scrollRef.current;
     if (!container || lowConversionProducts.length <= 5) return;
   
     let scrollAmount = 0;
-    const scrollSpeed = 1; // Increased speed for visibility (adjust as needed)
+    const scrollSpeed = 0.8; 
     let isPaused = false;
     let animationFrameId = null;
   
@@ -78,10 +80,10 @@ const Dashboard = () => {
         scrollAmount += scrollSpeed;
   
         if (scrollAmount >= maxScroll) {
-          scrollAmount = 0; // Reset to top when reaching the bottom
+          scrollAmount = 0; // Reset to top when reached the end
           container.scrollTop = 0;
         } else {
-          container.scrollTop = scrollAmount; // Smoothly scroll down
+          container.scrollTop = scrollAmount; // Smoothly scroll down if req
         }
       }
   
@@ -99,17 +101,15 @@ const Dashboard = () => {
       }
     };
   
-    // Add event listeners for hover pause/resume
+    // event listeners for hover pause/resume
     container.addEventListener("mouseenter", pauseScroll);
     container.addEventListener("mouseleave", resumeScroll);
   
-    // Start the scrolling
     animationFrameId = requestAnimationFrame(scrollContent);
   
-    // Cleanup function
     return () => {
       if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId); // Stop the animation
+        cancelAnimationFrame(animationFrameId); 
       }
       container.removeEventListener("mouseenter", pauseScroll);
       container.removeEventListener("mouseleave", resumeScroll);
@@ -128,18 +128,7 @@ const Dashboard = () => {
         mb="20px"
       >
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
-        <Button
-          sx={{
-            backgroundColor: "black",
-            color: colors.grey[100],
-            fontSize: "14px",
-            fontWeight: "bold",
-            padding: "10px 20px",
-          }}
-        >
-          <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-          Download Reports
-        </Button>
+        
       </Box>
 
       {/* GRID & CHARTS */}
@@ -149,7 +138,7 @@ const Dashboard = () => {
         gridAutoRows="minmax(150px, auto)" // Ensures even row heights
         gap="20px"
       >
-        {/* STATISTICS BOXES - Aligned Evenly */}
+        {/* STATISTICS BOXES */}
         {[
           {
             title: isLoading ? "Loading..." : `₹${totalSales}`,
@@ -162,7 +151,7 @@ const Dashboard = () => {
             icon: <PointOfSaleIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />,
           },
           {
-            title: isLoading ? "Loading..." : "1500", // Kept hardcoded as per original
+            title: isLoading ? "Loading..." : "1500", 
             subtitle: "Current Clients",
             icon: <PersonAddIcon sx={{ color: colors.greenAccent[600], fontSize: "26px" }} />,
           },
@@ -181,7 +170,7 @@ const Dashboard = () => {
             alignItems="center"
             justifyContent="center"
             p="20px"
-            height="150px" // Consistent height for all stat boxes
+            height="150px" 
           >
             <StatBox
               title={stat.title}
@@ -191,26 +180,26 @@ const Dashboard = () => {
           </Box>
         ))}
 
-        {/* ROW 2 - LINE CHART */}
+        {/*PCA Chart */}
         <Box
           gridColumn={isSmallScreen ? "span 12" : "span 8"}
           gridRow="span 3"
           backgroundColor="#212121"
           borderRadius="10px"
           p="20px"
-          height="400px" // Consistent height for larger components
+          height="600px" 
         >
           <LineChart isDashboard={true} />
         </Box>
 
-        {/* ROW 3 - LOW CONVERSION PRODUCTS */}
+        {/* LOW CONVERSION PRODUCTS */}
         <Box
   gridColumn={isSmallScreen ? "span 12" : "span 4"}
   gridRow="span 3"
   backgroundColor="#212121"
   borderRadius="10px"
   p="20px"
-  height="400px" // Ensure it stays within the grid
+  height="400px" 
   display="flex"
   flexDirection="column"
 >
@@ -222,7 +211,7 @@ const Dashboard = () => {
     ⚠️ Low Conversion Products
   </Typography>
 
-  {/* ✅ Scrollable Box with Improved Styling */}
+  {/* Scrollable Box with Better Styling */}
   <Box
   ref={scrollRef}
   maxHeight="310px"

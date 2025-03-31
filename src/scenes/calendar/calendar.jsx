@@ -18,7 +18,7 @@ const Calendar = () => {
           dynamicTyping: true,
           complete: (result) => {
             if (!result.data || result.data.length === 0) {
-              console.error("❌ Sales Data is empty!");
+              console.error("Sales Data is empty!");
               return;
             }
 
@@ -34,7 +34,6 @@ const Calendar = () => {
           },
         });
       })
-      .catch((error) => console.error("❌ Error loading sales data:", error));
   }, []);
 
   const drawHeatmap = useCallback(() => {
@@ -43,7 +42,7 @@ const Calendar = () => {
     const width = 2400;
     const height = 900;
     const cellSize = 20;
-    const margin = { top: 100, right: 200, bottom: 120, left: 120 };
+    const margin = { top: 190, right: 10, bottom: 80, left: 10 };
 
     d3.select(heatmapRef.current).select("svg").remove();
 
@@ -69,14 +68,11 @@ const Calendar = () => {
       .scaleSequential(d3.interpolatePurples)
       .domain([0, maxSales]);
 
-    const calendarWidth = 12 * (cellSize * 9) + margin.left;
-    const calendarHeight = 4 * (cellSize * 9) + margin.top;
-
-    // Enhanced Gradient Legend
-    const legendWidth = 400; // Increased width for better visibility
+    
+    const legendWidth = 400; 
     const legendHeight = 20;
-    const legendX = (calendarWidth - legendWidth) / 2;
-    const legendY = calendarHeight + 60;
+    const legendX = margin.left + 600;
+    const legendY = 30; 
 
     const legend = svg
       .append("g")
@@ -87,7 +83,6 @@ const Calendar = () => {
       .domain([0, maxSales])
       .range([0, legendWidth]);
 
-    // Gradient definition
     const legendGradient = legend
       .append("defs")
       .append("linearGradient")
@@ -105,7 +100,6 @@ const Calendar = () => {
       .attr("offset", (d) => `${d * 100}%`)
       .attr("stop-color", (d) => colorScale(d * maxSales));
 
-    // Gradient rectangle
     legend
       .append("rect")
       .attr("width", legendWidth)
@@ -131,9 +125,9 @@ const Calendar = () => {
       .selectAll("text")
       .style("fill", "#ccc")
       .style("font-size", "12px")
-      .attr("dy", "10px"); // Adjust text position below ticks
+      .attr("dy", "10px"); 
 
-    // Legend title
+
     legend
       .append("text")
       .attr("x", legendWidth / 2)
@@ -245,69 +239,6 @@ const Calendar = () => {
         });
       });
     });
-
-    // Descriptive Legend (aligned with gradient)
-    const descriptiveLegend = svg
-      .append("g")
-      .attr("transform", `translate(${legendX}, ${legendY + 60})`);
-
-    const legendItems = [
-      {
-        color: "#9B4D97",
-        text: `₹0 - ₹${Math.round(maxSales * 0.25).toLocaleString()}`,
-      },
-      {
-        color: "#720E7E",
-        text: `₹${Math.round(maxSales * 0.25).toLocaleString()} - ₹${Math.round(
-          maxSales * 0.5
-        ).toLocaleString()}`,
-      },
-      {
-        color: "#4A0072",
-        text: `₹${Math.round(maxSales * 0.5).toLocaleString()} - ₹${Math.round(
-          maxSales * 0.75
-        ).toLocaleString()}`,
-      },
-      {
-        color: "#2C003E",
-        text: `₹${Math.round(maxSales * 0.75).toLocaleString()} - ₹${Math.round(
-          maxSales
-        ).toLocaleString()}`,
-      },
-    ];
-
-    descriptiveLegend
-      .selectAll("g")
-      .data(legendItems)
-      .enter()
-      .append("g")
-      .attr("transform", (d, i) => `translate(0, ${i * 20})`)
-      .each(function (d) {
-        d3.select(this)
-          .append("rect")
-          .attr("x", 0)
-          .attr("y", 0)
-          .attr("width", 15)
-          .attr("height", 15)
-          .attr("fill", d.color);
-
-        d3.select(this)
-          .append("text")
-          .attr("x", 20)
-          .attr("y", 12)
-          .attr("fill", "#ccc")
-          .attr("font-size", "12px")
-          .text(d.text);
-      });
-
-    descriptiveLegend
-      .append("text")
-      .attr("x", legendWidth / 2)
-      .attr("y", -10)
-      .attr("fill", "#ccc")
-      .attr("text-anchor", "middle")
-      .style("font-size", "14px")
-      .text("Daily Sales Ranges");
   }, [salesData, maxSales]);
 
   useEffect(() => {

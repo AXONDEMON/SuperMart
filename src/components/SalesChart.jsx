@@ -2,20 +2,8 @@ import React, { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, parseISO } from 'date-fns';
 
-// Define the expected data shape
-interface SalesData {
-  date: string; // Expected in YYYY-MM-DD format (adjusted in parent component if needed)
-  revenue: number;
-  orders: number;
-  averageOrderValue: number;
-}
-
-interface SalesChartProps {
-  data: SalesData[];
-}
-
-const SalesChart: React.FC<SalesChartProps> = ({ data }) => {
-  const [dataKey, setDataKey] = useState<'revenue' | 'orders' | 'averageOrderValue'>('revenue');
+const SalesChart = ({ data }) => {
+  const [dataKey, setDataKey] = useState('revenue');
 
   const metrics = [
     { key: 'revenue', label: 'Total Revenue', color: '#6366F1' },
@@ -23,11 +11,10 @@ const SalesChart: React.FC<SalesChartProps> = ({ data }) => {
     { key: 'averageOrderValue', label: 'Average Order Value', color: '#14B8A6' },
   ];
 
-  // Handle empty or invalid data
   if (!data || data.length === 0) {
     return (
       <div className="bg-white p-6 rounded-xl shadow-sm h-full flex items-center justify-center">
-        <p className="text-gray-600">No sales data available</p>
+        <p className="text-gray-600">No sales data</p>
       </div>
     );
   }
@@ -66,8 +53,7 @@ const SalesChart: React.FC<SalesChartProps> = ({ data }) => {
                 try {
                   return format(parseISO(date), 'MMM dd');
                 } catch (error) {
-                  console.warn(`Invalid date format: ${date}`);
-                  return date; // Fallback to raw date if parsing fails
+                  return date; 
                 }
               }}
               stroke="#94A3B8"
@@ -90,7 +76,7 @@ const SalesChart: React.FC<SalesChartProps> = ({ data }) => {
                   return date;
                 }
               }}
-              formatter={(value: number) => {
+              formatter={(value) => { 
                 if (dataKey === 'revenue') return [`₹${value.toLocaleString()}`, 'Revenue'];
                 if (dataKey === 'orders') return [value.toString(), 'Orders'];
                 return [`₹${value}`, 'Avg. Order Value'];

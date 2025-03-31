@@ -7,29 +7,26 @@ import Team from "./scenes/filter";
 import Hybrid from "./scenes/hybrid";
 import Contacts from "./scenes/SalesForcast";
 import Bar from "./scenes/bar";
-import Form from "./scenes/form";
+import Form from "./scenes/database";
 import Line from "./scenes/line";
 import Pie from "./scenes/clv";
-import FAQ from "./scenes/faq";
 import Geography from "./scenes/geography";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
 import LoginPage from "./components/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { isAuthenticated } from "./big";
+import { isAuthenticated } from "./user";
 import "./App.css";
 
 function App() {
     const [theme, colorMode] = useMode();
     const [isSidebar, setIsSidebar] = useState(() => {
-        // ✅ Fix: Corrected optional chaining syntax
         const storedSidebarState = localStorage.getItem("isSidebar");
         return storedSidebarState !== null ? JSON.parse(storedSidebarState) : true;
     });
     const [filteredData, setFilteredData] = useState([]);
 
-    // ✅ Ensure Sidebar State is Saved in Local Storage
     useEffect(() => {
         localStorage.setItem("isSidebar", JSON.stringify(isSidebar));
     }, [isSidebar]);
@@ -68,7 +65,7 @@ function App() {
                         Route path = "/Hybrid"
                         element = { < ProtectedRoute > < Hybrid / > < /ProtectedRoute>} / >
                             <
-                            Route path = "/form"
+                            Route path = "/database"
                             element = { < ProtectedRoute > < Form / > < /ProtectedRoute>} / >
                                 <
                                 Route path = "/bar"
@@ -80,36 +77,34 @@ function App() {
                                         Route path = "/line"
                                         element = { < ProtectedRoute > < Line / > < /ProtectedRoute>} / >
                                             <
-                                            Route path = "/faq"
-                                            element = { < ProtectedRoute > < FAQ / > < /ProtectedRoute>} / >
+                                            Route path = "/calendar"
+                                            element = { < ProtectedRoute > < Calendar / > < /ProtectedRoute>} / >
                                                 <
-                                                Route path = "/calendar"
-                                                element = { < ProtectedRoute > < Calendar / > < /ProtectedRoute>} / >
+                                                Route path = "/geography"
+                                                element = { < ProtectedRoute > < Geography / > < /ProtectedRoute>} / >
                                                     <
-                                                    Route path = "/geography"
-                                                    element = { < ProtectedRoute > < Geography / > < /ProtectedRoute>} / >
-                                                        <
-                                                        Route path = "*"
-                                                        element = { < Navigate to = "/dashboard" / > }
-                                                        /> < /
-                                                        Routes > <
-                                                        /main> < / >
-                                                    ): ( <
-                                                        Routes >
-                                                        <
-                                                        Route path = "/login"
-                                                        element = { < LoginPage / > }
-                                                        /> <
-                                                        Route path = "*"
-                                                        element = { < Navigate to = "/login" / > }
-                                                        /> < /
-                                                        Routes >
-                                                    )
-                                                } <
-                                                /div> < /
-                                                ThemeProvider > <
-                                                /ColorModeContext.Provider>
-                                            );
-                                        }
+                                                    Route path = "*"
+                                                    element = { < Navigate to = "/dashboard" / > }
+                                                    /> < /
+                                                    Routes > <
+                                                    /main> < /
+                                                    >
+                                                ): ( <
+                                                    Routes >
+                                                    <
+                                                    Route path = "/login"
+                                                    element = { < LoginPage / > }
+                                                    /> <
+                                                    Route path = "*"
+                                                    element = { < Navigate to = "/login" / > }
+                                                    /> < /
+                                                    Routes >
+                                                )
+                                            } <
+                                            /div> < /
+                                            ThemeProvider > <
+                                            /ColorModeContext.Provider>
+                                        );
+                                    }
 
-                                        export default App;
+                                    export default App;

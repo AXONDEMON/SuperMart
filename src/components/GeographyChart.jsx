@@ -13,22 +13,19 @@ const GeographyChart = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [selectedStore, setSelectedStore] = useState(null);
 
-  // Google Maps API Key (replace with your own)
-  const GOOGLE_MAPS_API_KEY = "AIzaSyDmpH-050yAmHIlYEDH792Vv4ae7UKYaTA";
+  const GOOGLE_MAPS_API_KEY = "AIzaSyD9lkLt_twZ8qrZfF-2t1mR9U0B2BSoNmQ";
 
-  // Map container style
   const mapContainerStyle = {
     width: "100%",
     height: "500px",
   };
 
-  // Center of India (approximate)
+  //Center Lat and Long for India 
   const center = {
     lat: 20.5937,
     lng: 78.9629,
   };
 
-  // Table style
   const tableStyle = {
     width: "100%",
     borderCollapse: "collapse",
@@ -42,10 +39,10 @@ const GeographyChart = () => {
           "http://localhost:5008/api/analyze_stores"
         );
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error("Network response down.");
         }
         const result = await response.json();
-        console.log("Fetched Data:", result); // Debug log
+        console.log("Fetched Data:", result); 
         if (result.status === "success") {
           setData(result.data);
         } else {
@@ -67,8 +64,7 @@ const GeographyChart = () => {
 
   const processLocations = async (storeData) => {
     if (!window.google || !window.google.maps) {
-      console.error("Google Maps API not loaded");
-      setError("Google Maps API not loaded");
+      setError("Google Maps API in process.");
       return;
     }
 
@@ -81,14 +77,14 @@ const GeographyChart = () => {
             const { lat, lng } = results[0].geometry.location;
             resolve({ lat: lat(), lng: lng() });
           } else {
-            console.warn(`Geocoding failed for ${city}: ${status}`);
-            resolve({ lat: 20.5937, lng: 78.9629 }); // Fallback to center of India
+            console.warn(`Geo Location failed for ${city}: ${status}`);
+            resolve({ lat: 20.5937, lng: 78.9629 }); // Replacing it with center of India
           }
         });
       });
     };
 
-    // Process all physical stores
+    // Showing Physical Stores 
     const physicalPromises = storeData.physical_store_locations.map(
       async (store) => {
         const coords = await geocodeCity(store.city);
@@ -96,7 +92,8 @@ const GeographyChart = () => {
       }
     );
 
-    // Process top 5 recommended stores for each tier
+    // Top 5 recommended Store for each tier
+
     const getTop5 = (tierData) => {
       return tierData
         .sort(
@@ -167,7 +164,7 @@ const GeographyChart = () => {
           </tbody>
         </table>
       ) : (
-        <p>No data available</p>
+        <p>No data to process</p>
       )}
     </div>
   );
@@ -177,17 +174,17 @@ const GeographyChart = () => {
   }
 
   if (!data) {
-    return <div>Loading...</div>;
+    return <div>Processing...</div>;
   }
 
   return (
     <div style={{ fontFamily: "Arial, sans-serif", margin: "20px" }}>
       <h1>Retail Store Location Analysis</h1>
 
-      {/* Legend */}
+      {}
       <div style={{ marginBottom: "10px" }}>
         <span style={{ marginRight: "20px" }}>
-          <span style={{ color: "blue", marginRight: "5px" }}>●</span> Existing
+          <span style={{ color: "orange", marginRight: "5px" }}>●</span> Existing
           Stores
         </span>
         <span>
@@ -196,15 +193,13 @@ const GeographyChart = () => {
         </span>
       </div>
 
-      {/* Google Map */}
+      {}
       <LoadScript
         googleMapsApiKey={GOOGLE_MAPS_API_KEY}
         onLoad={() => {
-          console.log("Google Maps API Loaded");
           setMapLoaded(true);
         }}
         onError={(err) => {
-          console.error("Google Maps API Load Error:", err);
           setError("Failed to load Google Maps API");
         }}
       >
@@ -218,7 +213,7 @@ const GeographyChart = () => {
               key={`physical-${index}`}
               position={{ lat: store.lat, lng: store.lng }}
               icon={{
-                url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                url: "http://maps.google.com/mapfiles/ms/icons/orange-dot.png",
                 scaledSize: new window.google.maps.Size(40, 40),
               }}
               onClick={() => setSelectedStore({ ...store, type: "physical" })}
@@ -238,74 +233,84 @@ const GeographyChart = () => {
             />
           ))}
           {selectedStore && (
-            <InfoWindow
-              position={{ lat: selectedStore.lat, lng: selectedStore.lng }}
-              onCloseClick={() => setSelectedStore(null)}
-            >
-              <div
-                style={{
-                  maxWidth: "250px",
-                  fontSize: "14px",
-                  lineHeight: "1.5",
-                  color: "black",
-                }}
-              >
-                <h3 style={{ margin: "0 0 5px 0", color: "black" }}>
-                  {selectedStore.city}
-                </h3>
-                <p style={{ margin: "2px 0", color: "black" }}>
-                  {selectedStore.type === "physical"
-                    ? "Existing Store"
-                    : "Predicted Store"}
-                </p>
-                <p style={{ margin: "2px 0", color: "black" }}>
-                  <strong>Total Sales:</strong>{" "}
-                  {selectedStore.total_sales_per_transaction
-                    ? selectedStore.total_sales_per_transaction.toFixed(2)
-                    : "N/A"}
-                </p>
-                <p style={{ margin: "2px 0", color: "black" }}>
-                  <strong>Cumulative Spending:</strong>{" "}
-                  {selectedStore.cumulative_spending
-                    ? selectedStore.cumulative_spending.toFixed(2)
-                    : "N/A"}
-                </p>
-                <p style={{ margin: "2px 0", color: "black" }}>
-                  <strong>Transactions:</strong>{" "}
-                  {selectedStore.transaction_id || "N/A"}
-                </p>
-                <p style={{ margin: "2px 0", color: "black" }}>
-                  <strong>Unique Customers:</strong>{" "}
-                  {selectedStore.customer_id || "N/A"}
-                </p>
-                {selectedStore.store_profit && (
-                  <p style={{ margin: "2px 0", color: "black" }}>
-                    <strong>Store Profit:</strong>{" "}
-                    {selectedStore.store_profit.toFixed(2)}
-                  </p>
-                )}
-                {selectedStore.daily_footfall && (
-                  <p style={{ margin: "2px 0", color: "black" }}>
-                    <strong>Daily Footfall:</strong>{" "}
-                    {selectedStore.daily_footfall.toFixed(0)}
-                  </p>
-                )}
-                {selectedStore.average_order_value && (
-                  <p style={{ margin: "2px 0", color: "black" }}>
-                    <strong>Avg Order Value:</strong>{" "}
-                    {selectedStore.average_order_value.toFixed(2)}
-                  </p>
-                )}
-              </div>
-            </InfoWindow>
+  <InfoWindow
+    position={{ lat: selectedStore.lat, lng: selectedStore.lng }}
+    onCloseClick={() => setSelectedStore(null)}
+  >
+    <div
+      style={{
+        maxWidth: "250px",
+        fontSize: "14px",
+        lineHeight: "1.5",
+        color: "black",
+      }}
+    >
+      <h3 style={{ margin: "0 0 5px 0", color: "black" }}>
+        {selectedStore.city}
+      </h3>
+      <p style={{ margin: "2px 0", color: "black" }}>
+        {selectedStore.type === "physical"
+          ? "Existing Store"
+          : "Predicted Store"}
+      </p>
+      <p style={{ margin: "2px 0", color: "black" }}>
+  <strong>
+    {selectedStore.type === "physical"
+      ? "Total Sales"
+      : "Total Predicted Sales"}
+  </strong>{" "}
+  {selectedStore.total_sales_per_transaction
+    ? selectedStore.total_sales_per_transaction.toFixed(2)
+    : "N/A"}
+</p>
+
+      {/* Details only visible for existing stores*/}
+      {selectedStore.type === "physical" && (
+        <>
+          <p style={{ margin: "2px 0", color: "black" }}>
+            <strong>Cumulative Spending:</strong>{" "}
+            {selectedStore.cumulative_spending
+              ? selectedStore.cumulative_spending.toFixed(2)
+              : "N/A"}
+          </p>
+          <p style={{ margin: "2px 0", color: "black" }}>
+            <strong>Transactions:</strong>{" "}
+            {selectedStore.transaction_id || "N/A"}
+          </p>
+          <p style={{ margin: "2px 0", color: "black" }}>
+            <strong>Unique Customers:</strong>{" "}
+            {selectedStore.customer_id || "N/A"}
+          </p>
+          {selectedStore.store_profit && (
+            <p style={{ margin: "2px 0", color: "black" }}>
+              <strong>Store Profit:</strong>{" "}
+              {selectedStore.store_profit.toFixed(2)}
+            </p>
           )}
+          {selectedStore.daily_footfall && (
+            <p style={{ margin: "2px 0", color: "black" }}>
+              <strong>Daily Footfall:</strong>{" "}
+              {selectedStore.daily_footfall.toFixed(0)}
+            </p>
+          )}
+          {selectedStore.average_order_value && (
+            <p style={{ margin: "2px 0", color: "black" }}>
+              <strong>Avg Order Value:</strong>{" "}
+              {selectedStore.average_order_value.toFixed(2)}
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  </InfoWindow>
+)}
         </GoogleMap>
       </LoadScript>
     </div>
   );
 };
 
-// Apply styles directly to thead and tbody elements
+// CSS Styling
 const styles = `
   th, td {
     border: 1px solid #ddd;

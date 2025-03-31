@@ -4,10 +4,9 @@ import pandas as pd
 import os
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for React frontend
+CORS(app)  
 
-# Specify your CSV file
-DATA_FILE = 'public/data/indian_retail_data_audi_2028.csv'  # Adjust path as needed
+DATA_FILE = '/Users/apple/Desktop/Blazebuilders/Deloitte_Round_3/react-app/public/data/indian_retail_data_audi_2028.csv'  
 
 def load_and_validate_data():
     try:
@@ -29,7 +28,7 @@ def load_and_validate_data():
     except Exception as e:
         raise Exception(f"Error loading data: {str(e)}")
 
-# Define city tiers
+# City Tier 1,2,3
 tier_cities = {
     'Tier 1': ['Mumbai', 'New Delhi', 'Kolkata', 'Chennai', 'Bangalore', 'Hyderabad', 'Pune', 'Ahmedabad'],
     'Tier 2': ['Jaipur', 'Lucknow', 'Chandigarh', 'Nagpur', 'Surat', 'Visakhapatnam', 'Patna', 'Bhopal', 'Vadodara', 'Coimbatore'],
@@ -61,11 +60,11 @@ def analyze_stores():
             'customer_id': pd.Series.nunique
         }).reset_index()
 
-        # Split into Online and Physical
+        # Split into Online and Physical Stores
         online_city_data = city_store_analysis[city_store_analysis['store_type'] == 'Online'].copy()
         physical_city_data = city_store_analysis[city_store_analysis['store_type'] == 'Physical'].copy()
 
-        # Add tier column to online data
+        # Add tier column to online data Stores
         online_city_data['tier'] = online_city_data['city'].apply(assign_tier)
 
         # Cities with only online stores
@@ -74,17 +73,17 @@ def analyze_stores():
             by=['total_sales_per_transaction', 'cumulative_spending'], ascending=[False, False]
         )
 
-        # Split recommendations by tier
+        # Split recommendations acc to tier
         tier_1_recommendations = recommended_physical_store_cities[recommended_physical_store_cities['tier'] == 'Tier 1']
         tier_2_recommendations = recommended_physical_store_cities[recommended_physical_store_cities['tier'] == 'Tier 2']
         tier_3_recommendations = recommended_physical_store_cities[recommended_physical_store_cities['tier'] == 'Tier 3']
 
-        # Convert to JSON-friendly format
+        # Convert to JSON format
         response = {
             'tier_1_recommendations': tier_1_recommendations.to_dict(orient='records'),
             'tier_2_recommendations': tier_2_recommendations.to_dict(orient='records'),
             'tier_3_recommendations': tier_3_recommendations.to_dict(orient='records'),
-            'physical_store_locations': physical_city_data.to_dict(orient='records')  # All physical stores included here
+            'physical_store_locations': physical_city_data.to_dict(orient='records')  # All physical stores are included here
         }
 
         return jsonify({

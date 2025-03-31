@@ -13,5 +13,5 @@ export const loadCSVData = (filePath, callback) => {
                 }
             });
         })
-        .catch(error => console.error("Error loading CSV file:", error));
+        .catch(error => console.error("CSV Load Error", error));
 };

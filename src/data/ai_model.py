@@ -5,10 +5,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for React frontend
+CORS(app)  #CORS for Global Implementation
 
-# Load and process dataset
-file_path = "public/data/indian_retail_data_audi_2028.csv"  # Update with your actual path
+file_path = "/Users/apple/Desktop/Blazebuilders/Deloitte_Round_3/react-app/public/data/indian_retail_data_audi_2030.csv"  
 df = pd.read_csv(file_path)
 df_products = df[['product_name', 'category']].dropna().drop_duplicates()
 
@@ -30,7 +29,6 @@ category_refinement = {
     }
 }
 
-# Assign sub-category
 def assign_subcategory(product_name, category):
     if category in category_refinement:
         for sub_category, keywords in category_refinement[category].items():
@@ -42,7 +40,6 @@ df_products["sub_category"] = df_products.apply(
     lambda row: assign_subcategory(row["product_name"], row["category"]), axis=1
 )
 
-# Recommendation function
 def recommend_similar_products(product_name, df, cosine_sim, num_recommendations=5):
     matching_products = df[df["product_name"].str.contains(product_name, case=False, na=False)]
     if matching_products.empty:
@@ -63,7 +60,6 @@ def recommend_similar_products(product_name, df, cosine_sim, num_recommendations
 
     return {"recommendations": recommended_product_names} if recommended_product_names else {"error": "No relevant recommendations found."}
 
-# API endpoint
 @app.route('/api/recommend', methods=['POST'])
 def get_recommendations():
     data = request.get_json()

@@ -96,21 +96,55 @@ const SalesChart = () => {
   const options = {
     responsive: true,
     plugins: {
-      legend: { position: "top" },
-      title: { display: true, text: "Yearly Sales Forecast (2021 - 2028)" },
+      legend: { 
+        position: "top",
+        labels: { 
+          color: "#ffffff" 
+        }
+      },
+      title: { 
+        display: true, 
+        text: "Yearly Sales Forecast (2021 - 2028)", 
+        color: "#ffffff",
+        font: { 
+          size: 18, // Increased font size for the title
+          weight: 400 // Keeping the default weight, adjust if needed
+        }
+      },
     },
     scales: {
       y: {
         beginAtZero: false,
-        title: { display: true, text: "Total Sales (Rs)" },
-        min: 80000000,  // Adjust this value to set the lower limit of the Y-axis
+        title: { 
+          display: true, 
+          text: "Total Sales (Rs)", 
+          color: "#ffffff",
+          font: { 
+            size: 16, // Increased font size for Y-axis title
+            weight: 600 
+          }
+        },
+        min: 80000000,
+        ticks: { 
+          color: "#ffffff" 
+        }
       },
       x: {
-        title: { display: true, text: "Year" },
+        title: { 
+          display: true, 
+          text: "Year", 
+          color: "#ffffff",
+          font: { 
+            size: 16, // Increased font size for X-axis title
+            weight: 600 
+          }
+        },
+        ticks: { 
+          color: "#ffffff" 
+        }
       },
     },
   };
-  
 
   return (
     <div className="p-6 bg-gray-900 text-white rounded-xl shadow-lg">

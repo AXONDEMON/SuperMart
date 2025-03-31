@@ -15,7 +15,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import StorefrontIcon from "@mui/icons-material/Storefront";
-import FilterListIcon from "@mui/icons-material/FilterList"; // ✅ Unique Icon for Filters
+import StorageOutlinedIcon from "@mui/icons-material/StorageOutlined";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -48,6 +48,7 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
+        height: "150%",
         backgroundColor: "#38B68E", // Changed background color
         "& .pro-sidebar-inner": {
           background: "#08392D", // Sidebar background
@@ -91,16 +92,18 @@ const Sidebar = () => {
             )}
           </MenuItem>
 
-          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+          <Box paddingLeft={isCollapsed ? undefined : "5%"}>
             <Item title="Dashboard" to="/" icon={<HomeOutlinedIcon />} selected={selected} setSelected={setSelected} />
-            <Item title="Filters" to="/filter" icon={<PeopleOutlinedIcon />} selected={selected} setSelected={setSelected} />
+            <Item title="Self Service Reports" to="/filter" icon={<PeopleOutlinedIcon />} selected={selected} setSelected={setSelected} />
             <Item title="Yearly Sales Forecast" to="/SalesForcast" icon={<ContactsOutlinedIcon />} selected={selected} setSelected={setSelected} />
-            <Item title="Product Recommend" to="/hybrid" icon={<ReceiptOutlinedIcon />} selected={selected} setSelected={setSelected} />
+            <Item title="Recommendation Model" to="/hybrid" icon={<ReceiptOutlinedIcon />} selected={selected} setSelected={setSelected} />
             <Item title="Calendar" to="/calendar" icon={<CalendarTodayOutlinedIcon />} selected={selected} setSelected={setSelected} />
-            <Item title="Low Selling Products" to="/bar" icon={<BarChartOutlinedIcon />} selected={selected} setSelected={setSelected} />
-            <Item title="Customer Lifetime Value Prediction" to="/clv" icon={<PieChartOutlineOutlinedIcon />} selected={selected} setSelected={setSelected} />
-            <Item title="Customer Behaviour" to="/line" icon={<TimelineOutlinedIcon />} selected={selected} setSelected={setSelected} />
+            <Item title="Customer Lifetime Value " to="/clv" icon={<PieChartOutlineOutlinedIcon />} selected={selected} setSelected={setSelected} />
+            <Item title="Customer Segmentation" to="/line" icon={<TimelineOutlinedIcon />} selected={selected} setSelected={setSelected} />
             <Item title="Geography " to="/geography" icon={<MapOutlinedIcon />} selected={selected} setSelected={setSelected} />
+            <Item title="Low Selling Products" to="/bar" icon={<BarChartOutlinedIcon />} selected={selected} setSelected={setSelected} />
+            <Item title="Database" to="/database" icon={<StorageOutlinedIcon />} selected={selected} setSelected={setSelected} />
+
           </Box>
         </Menu>
       </ProSidebar>

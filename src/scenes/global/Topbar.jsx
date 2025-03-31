@@ -5,11 +5,11 @@ import {
   DialogTitle, TextField 
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";  // ✅ Fixed missing sidebar button
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import { isAuthenticated, storeCredentials, logout } from "../../big"; 
+import { isAuthenticated, storeCredentials, logout } from "../../user"; 
+import GlobalSearch from "../../components/GlobalSearch"; // Import the existing GlobalSearch component
 
 const Topbar = ({ setIsSidebar }) => {
   const theme = useTheme();
@@ -29,7 +29,7 @@ const Topbar = ({ setIsSidebar }) => {
 
   const handleLoginSubmit = () => {
     if (!credentials.username || !credentials.password) {
-      alert("Username and password cannot be empty!");  // ✅ Prevent empty submissions
+      alert("Username and password cannot be empty!");  
       return;
     }
 
@@ -37,7 +37,7 @@ const Topbar = ({ setIsSidebar }) => {
     if (isValid) {
       setAuth(true);
       setOpenLogin(false);
-      navigate("/dashboard", { replace: true }); // ✅ Redirect without reload
+      navigate("/dashboard", { replace: true }); 
     } else {
       alert("Invalid username or password!");
       setCredentials({ username: "", password: "" });
@@ -48,7 +48,7 @@ const Topbar = ({ setIsSidebar }) => {
     logout();
     setAuth(false);
     setAnchorEl(null);
-    navigate("/login", { replace: true }); // ✅ Redirect without reload
+    navigate("/login", { replace: true }); // Redirect without reload
   };
 
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -56,10 +56,8 @@ const Topbar = ({ setIsSidebar }) => {
 
   return (
     <Box display="flex" justifyContent="space-between" p={2} bgcolor={theme.palette.background.paper}>
-      {/* ✅ Sidebar Toggle Button (Fix) */}
-      <IconButton onClick={() => setIsSidebar((prev) => !prev)}>
-        
-      </IconButton>
+      {/* Add GlobalSearch component in place of the removed IconButton */}
+      <GlobalSearch />
 
       <Box display="flex" alignItems="center">
         <Tooltip title="Notifications">
